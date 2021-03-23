@@ -78,14 +78,14 @@ __global__ void highPassFilter_kernel(cufftComplex* d_complex, int NY, int NX, i
     const int yIndex = blockIdx.y * blockDim.y + threadIdx.y;
     const int zIndex = blockIdx.z;
 
-    if (xIndex < hp_filter_size && yIndex < hp_filter_size)
+    if (xIndex < hp_filter_size * 2 && yIndex < hp_filter_size * 2)
     {
         d_complex += (zIndex * NY * NX);
 
         const int NY_HALF = NY / 2;
         const int NX_HALF = NX / 2;
-        const int y_offset = NY_HALF - (hp_filter_size / 2) + yIndex;
-        const int x_offset = NX_HALF - (hp_filter_size / 2) + xIndex;
+        const int y_offset = NY_HALF - hp_filter_size + yIndex;
+        const int x_offset = NX_HALF - hp_filter_size + xIndex;
         cufftComplex zero { .x = 0.f, .y = 0.f };
         d_complex[y_offset * NX + x_offset] = zero;
     }
@@ -107,7 +107,7 @@ GpuBlurDetector::GpuBlurDetector(int image_rows, int image_cols, int max_images,
     , max_images(max_images)
     , hp_filter_size(hp_filter_size)
 {
-    if (hp_filter_size > image_rows || hp_filter_size > image_cols)
+    if (hp_filter_size * 2 > image_rows || hp_filter_size * 2 > image_cols)
     {
         throw std::invalid_argument("High pass filter size cannot be larger than the image");
     }
@@ -149,7 +149,7 @@ void GpuBlurDetector::detectBlur(float* blur_results, float* images, int num_ima
 
     {
         dim3 block(16, 16);
-        dim3 grid((hp_filter_size + block.x + 1) / block.x, (hp_filter_size + block.y + 1) / block.y, num_images);
+        dim3 grid((hp_filter_size * 2 + block.x + 1) / block.x, (hp_filter_size * 2 + block.y + 1) / block.y, num_images);
         highPassFilter_kernel<<<grid, block>>>(d_complex, NY, NX, hp_filter_size);
     }
 
