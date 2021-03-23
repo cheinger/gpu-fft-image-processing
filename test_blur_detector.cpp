@@ -49,10 +49,11 @@ int main(int argc, char* argv[])
         std::memcpy(images.data() + i * rows * cols, image.data, rows * cols * sizeof(float));
     }
 
+
     std::vector<float> blur_results(num_images);
 
     GpuBlurDetector detector(rows, cols, num_images);
-    detector.detectBlur(blur_results.data(), images.data(), num_images, true);
+    detector.detectBlur(blur_results.data(), images.data(), num_images, false);
 
     for (int i = 0; i < num_images; ++i)
     {
