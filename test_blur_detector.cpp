@@ -23,15 +23,12 @@ int main(int argc, char* argv[])
             return -1;
         }
 
-        cv::Mat fImage;
-        image.convertTo(fImage, CV_32F);
-
         if (i == 0)
         {
-            rows = fImage.rows;
-            cols = fImage.cols;
+            rows = image.rows;
+            cols = image.cols;
         }
-        else if (rows != fImage.rows || cols != fImage.cols)
+        else if (rows != image.rows || cols != image.cols)
         {
             fprintf(stderr, "Images must be the same dimension\n");
             return -1;
