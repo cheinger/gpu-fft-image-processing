@@ -91,12 +91,13 @@ __global__ void highPassFilter_kernel(cufftComplex* d_complex, int NY, int NX, i
     }
 }
 
-__global__ void cufftNormalizeReal_kernel(cufftComplex* d_complex, int size)
+__global__ void cufftMagnitude_kernel(cufftComplex* d_complex, int size)
 {
     const int xIndex = blockIdx.x * blockDim.x + threadIdx.x;
     if (xIndex < size)
     {
-        d_complex[xIndex].x = logf(abs(d_complex[xIndex].x)) * 20;
+        float magnitude = logf(abs(d_complex[xIndex].x)) * 20;
+        d_complex[xIndex].x = magnitude;
     }
 }
 
@@ -162,7 +163,7 @@ void GpuBlurDetector::detectBlur(float* blur_results, float* images, int num_ima
     {
         dim3 block(256);
         dim3 grid((total + block.x + 1) / block.x);
-        cufftNormalizeReal_kernel<<<grid, block>>>(d_complex, total);
+        cufftMagnitude_kernel<<<grid, block>>>(d_complex, total);
     }
 
     if( vis )
@@ -170,7 +171,7 @@ void GpuBlurDetector::detectBlur(float* blur_results, float* images, int num_ima
         displayImage(0);
     }
 
-    // TODO: Normalize and calculate mean on GPU
+    // TODO: Calculate mean on GPU
     for( int i = 0; i < num_images; ++i )
     {
         cv::Mat real(NY, NX, CV_32F);
