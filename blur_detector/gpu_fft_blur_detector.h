@@ -5,7 +5,7 @@
 class GpuBlurDetector
 {
 public:
-    GpuBlurDetector(int image_rows, int image_cols, int max_images, int hp_filter_size = 60);
+    GpuBlurDetector(int image_rows, int image_cols, int max_images, int hp_filter_size = -1);
 
     ~GpuBlurDetector();
 

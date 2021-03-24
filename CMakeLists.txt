@@ -3,7 +3,17 @@ project(image-blur)
 find_package(CUDA REQUIRED)
 
 set(CMAKE_CXX_STANDARD 14)
-set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -gencode arch=compute_50,code=sm_50 -O3")
+set(CUDA_NVCC_FLAGS "${CUDA_NVCC_FLAGS} -O3 -gencode arch=compute_35,code=sm_35\
+                                            -gencode arch=compute_37,code=sm_37\
+                                            -gencode arch=compute_50,code=sm_50\
+                                            -gencode arch=compute_52,code=sm_52\
+                                            -gencode arch=compute_60,code=sm_60\
+                                            -gencode arch=compute_61,code=sm_61\
+                                            -gencode arch=compute_70,code=sm_70\
+                                            -gencode arch=compute_75,code=sm_75\
+                                            -gencode arch=compute_80,code=sm_80\
+                                            -gencode arch=compute_86,code=sm_86\
+                                            -gencode arch=compute_86,code=compute_86")
 link_directories(${CUDA_TOOLKIT_ROOT_DIR}/lib64)
 include_directories(${CMAKE_SOURCE_DIR}/)
 

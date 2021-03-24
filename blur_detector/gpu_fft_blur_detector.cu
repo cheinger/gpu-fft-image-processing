@@ -105,7 +105,7 @@ GpuBlurDetector::GpuBlurDetector(int image_rows, int image_cols, int max_images,
     : NY(image_rows)
     , NX(image_cols)
     , max_images(max_images)
-    , hp_filter_size(hp_filter_size)
+    , hp_filter_size(hp_filter_size == -1 ? std::ceil(std::min(NY, NX) * 0.1) : hp_filter_size)
 {
     if (hp_filter_size * 2 > image_rows || hp_filter_size * 2 > image_cols)
     {
