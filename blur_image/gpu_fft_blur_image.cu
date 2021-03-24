@@ -23,6 +23,11 @@ GpuBlurImage::GpuBlurImage(int image_rows, int image_cols, int max_images, int k
     , NX(image_cols)
     , max_images(max_images)
 {
+    if (kernel_size > std::min(NY, NX))
+    {
+        throw std::invalid_argument("Kernel size cannot be larger than the image dimensions");
+    }
+    
     int n[2] = {NY, NX};
     CUFFT_CHK(cufftPlanMany(&plan, 2, n, NULL, 1, 0, NULL, 1, 0, CUFFT_C2C, max_images));
 

@@ -47,7 +47,6 @@ int main(int argc, char* argv[])
         std::memcpy(images.data() + i * rows * cols, image.data, rows * cols * sizeof(float));
     }
 
-
     GpuBlurImage blur_image(rows, cols, num_images, 5);
     blur_image.blur(images.data(), images.data(), num_images);
 
