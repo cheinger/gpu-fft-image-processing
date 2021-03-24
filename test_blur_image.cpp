@@ -1,4 +1,4 @@
-#include "image_blur/gpu_fft_image_blur.h"
+#include "blur_image/gpu_fft_blur_image.h"
 
 #include <opencv2/opencv.hpp>
 #include <vector>
@@ -48,8 +48,8 @@ int main(int argc, char* argv[])
     }
 
 
-    GpuImageBlur image_blur(rows, cols, num_images, 5);
-    image_blur.blur(images.data(), images.data(), num_images);
+    GpuBlurImage blur_image(rows, cols, num_images, 5);
+    blur_image.blur(images.data(), images.data(), num_images);
 
     for (int i = 0; i < num_images; ++i)
     {

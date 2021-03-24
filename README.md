@@ -24,9 +24,9 @@ make
 $ ./test_blur_detector ./images/lena_1.jpg ./images/lena_2.jpg ./images/lena_3.jpg ./images/lena_4.jpg
 ```
 
-#### Run the Image Blur
+#### Run the Blur Image
 ```
-$ ./test_image_blur ./images/adrian_01.png ./images/adrian_02.png
+$ ./test_blur_image ./images/adrian_01.png ./images/adrian_02.png
 ```
 
 *Note: when processing multiple images, each image must be the same dimension*
@@ -47,7 +47,7 @@ float* images = ...
 detector.detectBlur(blur_values, images, num_images);
 ```
 
-# Image Blur
+# Blur Image
 
 Makes an image blurry.
 The larger the kernel/filter size the more blurry the image will be.
@@ -55,10 +55,10 @@ The API allows you to blur multiple images on the GPU at once.
 
 ### API
 ```cpp
-GpuImageBlur image_blur(image_height, image_width, max_num_images, kernel_size);
+GpuBlurImage blur_image(image_height, image_width, max_num_images, kernel_size);
 
 float* images = ...
 float* blurred_images = ...
 
-image_blur.blur(blurred_images, images, num_images);
+blur_image.blur(blurred_images, images, num_images);
 ```

@@ -3,12 +3,12 @@
 #include <cufft.h>
 #include <vector>
 
-class GpuImageBlur
+class GpuBlurImage
 {
 public:
-    GpuImageBlur(int image_rows, int image_cols, int max_images, int kernel_size);
+    GpuBlurImage(int image_rows, int image_cols, int max_images, int kernel_size);
 
-    ~GpuImageBlur();
+    ~GpuBlurImage();
 
     /**
      * Transform an image into a blurry image.

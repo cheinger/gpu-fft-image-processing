@@ -1,4 +1,4 @@
-#include "gpu_fft_image_blur.h"
+#include "gpu_fft_blur_image.h"
 #include "helper/cuda_check.h"
 #include "helper/cufft_check.h"
 #include <opencv2/opencv.hpp>
@@ -18,7 +18,7 @@ __global__ void complexPointwiseMulAndScale_kernel(cufftComplex *a, cufftComplex
     }
 }
 
-GpuImageBlur::GpuImageBlur(int image_rows, int image_cols, int max_images, int kernel_size)
+GpuBlurImage::GpuBlurImage(int image_rows, int image_cols, int max_images, int kernel_size)
     : NY(image_rows)
     , NX(image_cols)
     , max_images(max_images)
@@ -53,14 +53,14 @@ GpuImageBlur::GpuImageBlur(int image_rows, int image_cols, int max_images, int k
     }
 }
 
-GpuImageBlur::~GpuImageBlur()
+GpuBlurImage::~GpuBlurImage()
 {
     CUFFT_CHK(cufftDestroy(plan));
     CUDA_CHK(cudaFree(d_complex));
     CUDA_CHK(cudaFree(d_gaussian_kernel));
 }
 
-void GpuImageBlur::blur(float *blurred_images, float *images, int num_images)
+void GpuBlurImage::blur(float *blurred_images, float *images, int num_images)
 {
     assert(num_images <= max_images);
     const int total = NY * NX * num_images;
@@ -84,7 +84,7 @@ void GpuImageBlur::blur(float *blurred_images, float *images, int num_images)
     CUDA_CHK(cudaMemcpy2D(blurred_images, sizeof(float), d_complex, sizeof(cufftComplex), sizeof(float), total, cudaMemcpyDeviceToHost));
 }
 
-std::vector<float> GpuImageBlur::createGaussianFilter(int kernel_size)
+std::vector<float> GpuBlurImage::createGaussianFilter(int kernel_size)
 {
     const int radius = kernel_size / 2;
     const float sigma = kernel_size / 4; // By default, radius of kernel = 2 * sigma
