@@ -48,7 +48,7 @@ int main(int argc, char* argv[])
     }
 
 
-    GpuImageBlur image_blur(rows, cols, num_images, 5);
+    GpuImageBlur image_blur(rows, cols, num_images, 10);
     image_blur.blur(images.data(), images.data(), num_images);
 
     for (int i = 0; i < num_images; ++i)
