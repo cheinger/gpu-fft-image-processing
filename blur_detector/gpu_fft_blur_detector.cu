@@ -1,6 +1,6 @@
 #include "gpu_fft_blur_detector.h"
-#include "cuda_check.h"
-#include "cufft_check.h"
+#include "helper/cuda_check.h"
+#include "helper/cufft_check.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/core.hpp>
 #include <cassert>
