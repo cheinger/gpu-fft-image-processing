@@ -22,13 +22,12 @@ GpuImageBlur::GpuImageBlur(int image_rows, int image_cols, int max_images, int k
     : NY(image_rows)
     , NX(image_cols)
     , max_images(max_images)
-    , kernel_size(kernel_size)
 {
     int n[2] = {NY, NX};
     CUFFT_CHK(cufftPlanMany(&plan, 2, n, NULL, 1, 0, NULL, 1, 0, CUFFT_C2C, max_images));
 
     CUDA_CHK(cudaMalloc(&d_complex, sizeof(cufftComplex) * NY * NX * max_images));
-    CUDA_CHK(cudaMallocManaged(&d_gaussian_kernel, sizeof(cufftComplex) * NY * NX));
+    CUDA_CHK(cudaMallocManaged(&d_gaussian_kernel, sizeof(cufftComplex) * NY * NX * max_images));
 
     std::vector<float> filter = createGaussianFilter(kernel_size);
 
@@ -46,6 +45,12 @@ GpuImageBlur::GpuImageBlur(int image_rows, int image_cols, int max_images, int k
     CUFFT_CHK(cufftExecC2C(gaussian_plan, d_gaussian_kernel, d_gaussian_kernel, CUFFT_FORWARD));
     CUDA_CHK(cudaDeviceSynchronize());
     CUFFT_CHK(cufftDestroy(gaussian_plan));
+
+    // Copy the FFT gaussian kernel for every image in batch
+    for (int i = 1; i < max_images; ++i)
+    {
+        CUDA_CHK(cudaMemcpy(&d_gaussian_kernel[i * NY * NX], d_gaussian_kernel, sizeof(cufftComplex) * NY * NX, cudaMemcpyDeviceToDevice));
+    }
 }
 
 GpuImageBlur::~GpuImageBlur()

@@ -40,7 +40,7 @@ int main(int argc, char* argv[])
     {
         cv::Mat image = cv::imread(files[i].c_str(), cv::IMREAD_GRAYSCALE);
         assert(!image.empty());
-        cv::imshow("Original", image);
+        cv::imshow(files[i], image);
 
         image.convertTo(image, CV_32F);
 
@@ -48,14 +48,14 @@ int main(int argc, char* argv[])
     }
 
 
-    GpuImageBlur image_blur(rows, cols, num_images, 10);
+    GpuImageBlur image_blur(rows, cols, num_images, 5);
     image_blur.blur(images.data(), images.data(), num_images);
 
     for (int i = 0; i < num_images; ++i)
     {
         cv::Mat image(rows, cols, CV_32F, images.data() + i * rows * cols);
         image.convertTo(image, CV_8U);
-        cv::imshow("Blurred Result", image);
+        cv::imshow("Blurred " + files[i] + std::to_string(i), image);
     }
 
     cv::waitKey();

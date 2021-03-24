@@ -112,11 +112,15 @@ GpuBlurDetector::GpuBlurDetector(int image_rows, int image_cols, int max_images,
         throw std::invalid_argument("High pass filter size cannot be larger than the image");
     }
 
+    int n[2] = {NY, NX};
+    CUFFT_CHK(cufftPlanMany(&plan, 2, n, NULL, 1, 0, NULL, 1, 0, CUFFT_C2C, max_images));
+
     CUDA_CHK(cudaMalloc(&d_complex, sizeof(cufftComplex) * NY * NX * max_images));
 }
 
 GpuBlurDetector::~GpuBlurDetector()
 {
+    CUFFT_CHK(cufftDestroy(plan));
     CUDA_CHK(cudaFree(d_complex));
 }
 
@@ -130,9 +134,6 @@ void GpuBlurDetector::detectBlur(float* blur_results, float* images, int num_ima
     // Set d_complex[*].x
     CUDA_CHK(cudaMemcpy2D(d_complex, sizeof(cufftComplex), images, sizeof(float), sizeof(float), total, cudaMemcpyHostToDevice));
 
-    int n[2] = {NY, NX};
-    cufftHandle plan;
-    CUFFT_CHK(cufftPlanMany(&plan, 2, n, NULL, 1, 0, NULL, 1, 0, CUFFT_C2C, num_images));
     CUFFT_CHK(cufftExecC2C(plan, d_complex, d_complex, CUFFT_FORWARD));
 
     {
@@ -171,17 +172,15 @@ void GpuBlurDetector::detectBlur(float* blur_results, float* images, int num_ima
         displayImage(0);
     }
 
-    // TODO: Calculate mean on GPU
     for( int i = 0; i < num_images; ++i )
     {
         cv::Mat real(NY, NX, CV_32F);
         CUDA_CHK(cudaMemcpy2D(real.data, sizeof(float), &d_complex[i * NY * NX], sizeof(cufftComplex), sizeof(float), NY * NX, cudaMemcpyDeviceToHost));
 
-        cv::Scalar result= cv::mean(real);
+        cv::Scalar result= cv::mean(real); // TODO: Calculate mean on GPU
 
         blur_results[i] = result.val[0];
     }
-
 }
 
 void GpuBlurDetector::displayImage(int image)

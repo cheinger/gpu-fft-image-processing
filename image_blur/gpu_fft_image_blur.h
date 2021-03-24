@@ -30,7 +30,6 @@ private:
     int NY = 0;
     int NX = 0;
     int max_images = 0;
-    int kernel_size = 0;
     cufftComplex* d_complex = nullptr;
     cufftComplex* d_gaussian_kernel = nullptr;
     cufftHandle plan;

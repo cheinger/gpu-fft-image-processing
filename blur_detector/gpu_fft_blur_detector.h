@@ -37,4 +37,5 @@ private:
     int max_images = 0;
     int hp_filter_size = 0; // High pass filter box dimensions (width == height)
     cufftComplex* d_complex = nullptr;
+    cufftHandle plan;
 };
